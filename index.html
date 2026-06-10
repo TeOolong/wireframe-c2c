@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireframe — Validación Vendedor</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background:#e8e8e8;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:24px 16px 48px;
+}
+
+.lab-badge {
+  background:#1a1a1a; color:#fff;
+  font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  padding:4px 12px; border-radius:20px; margin-bottom:8px;
+}
+.exp-title { font-size:11px; color:#555; letter-spacing:0.5px; margin-bottom:28px; text-align:center; }
+
+/* ── PHONE ───────────────────────────────── */
+.phone {
+  width:390px; background:#fff; border-radius:40px;
+  box-shadow: 0 0 0 10px #1a1a1a, 0 0 0 11px #333, 0 30px 80px rgba(0,0,0,.35);
+  overflow:hidden; position:relative;
+}
+.phone::before {
+  content:''; display:block; width:120px; height:28px;
+  background:#1a1a1a; border-radius:0 0 20px 20px;
+  margin:0 auto; position:relative; z-index:10;
+}
+
+/* ── SCREEN ──────────────────────────────── */
+.screen { display:none; flex-direction:column; height:780px; overflow:hidden; background:#fafafa; }
+.screen.active { display:flex; animation:fadeIn .22s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateX(8px)} to{opacity:1;transform:translateX(0)} }
+
+/* ── STATUS BAR ──────────────────────────── */
+.status-bar { display:flex; justify-content:space-between; align-items:center; padding:8px 20px 0; background:#fff; }
+.status-time { font-size:12px; font-weight:700; color:#1a1a1a; }
+.status-icons { display:flex; gap:6px; align-items:center; font-size:11px; color:#1a1a1a; }
+
+/* ── NAV BAR ─────────────────────────────── */
+.nav-bar { display:flex; align-items:center; padding:10px 16px 8px; background:#fff; border-bottom:1px solid #eee; gap:10px; }
+.nav-back {
+  width:32px; height:32px; border-radius:50%; background:#f0f0f0; border:none;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:16px; color:#333; flex-shrink:0;
+}
+.nav-title { font-size:15px; font-weight:700; color:#1a1a1a; }
+.nav-step { margin-left:auto; font-size:11px; color:#888; font-weight:500; }
+
+/* ── PROGRESS ────────────────────────────── */
+.progress-wrap { height:3px; background:#e8e8e8; width:100%; }
+.progress-fill { height:100%; background:#1a1a1a; transition:width .4s ease; }
+
+/* ── SCROLL ──────────────────────────────── */
+.scroll-content { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:14px; }
+.scroll-content::-webkit-scrollbar { width:0; }
+
+/* ── LABELS ──────────────────────────────── */
+.section-label { font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#888; margin-bottom:2px; }
+
+/* ── CARD ────────────────────────────────── */
+.card { background:#fff; border-radius:14px; border:1px solid #e0e0e0; padding:14px; display:flex; flex-direction:column; gap:10px; }
+
+/* ── TRUST BANNER ────────────────────────── */
+.trust-banner { background:#1a1a1a; color:#fff; border-radius:12px; padding:12px 14px; display:flex; gap:10px; align-items:flex-start; }
+.trust-icon { font-size:20px; flex-shrink:0; margin-top:1px; }
+.trust-text { font-size:11.5px; line-height:1.5; }
+.trust-text strong { display:block; font-size:12px; margin-bottom:2px; }
+
+/* ── PHOTO SECTIONS ──────────────────────── */
+.photo-section-label {
+  font-size:11px; font-weight:700; color:#444;
+  padding:6px 0 4px; border-bottom:1px solid #f0f0f0; margin-bottom:6px;
+  display:flex; align-items:center; gap:6px;
+}
+.photo-req-badge {
+  font-size:9px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;
+  background:#1a1a1a; color:#fff; padding:1px 6px; border-radius:4px;
+}
+.photo-opt-badge {
+  font-size:9px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;
+  background:#e8e8e8; color:#666; padding:1px 6px; border-radius:4px;
+}
+.photo-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; }
+.photo-slot {
+  aspect-ratio:1; background:#f0f0f0; border-radius:10px; border:1.5px dashed #bbb;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; font-size:20px; color:#999; cursor:pointer; position:relative; overflow:hidden;
+  transition:border-color .15s;
+}
+.photo-slot:hover { border-color:#888; }
+.photo-slot.filled { border:1.5px solid #ddd; background:#e0e0e0; }
+.photo-slot.filled::after {
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(0,0,0,.04) 6px,rgba(0,0,0,.04) 12px);
+}
+.photo-slot .photo-label { font-size:8.5px; color:#666; font-weight:700; letter-spacing:.3px; position:relative; z-index:1; text-align:center; padding:0 2px; }
+.photo-slot .cam { position:relative; z-index:1; }
+.photo-slot.filled .photo-label { color:#888; }
+/* completed tick */
+.photo-slot.filled .tick {
+  position:absolute; top:4px; right:5px; font-size:11px; color:#333; z-index:2; font-weight:700;
+}
+/* optional add slot */
+.photo-slot.optional-add { border:1.5px dashed #ccc; background:#f7f7f7; }
+.tag-input-row { display:flex; gap:6px; align-items:center; }
+.tag-input {
+  flex:1; border:1.5px solid #e0e0e0; border-radius:8px; padding:7px 10px;
+  font-size:12px; color:#1a1a1a; background:#fff; outline:none;
+}
+.tag-input:focus { border-color:#888; }
+.tag-add-btn {
+  background:#1a1a1a; color:#fff; border:none; border-radius:8px;
+  padding:7px 12px; font-size:12px; font-weight:700; cursor:pointer;
+}
+
+/* ── FIELDS ──────────────────────────────── */
+.field-label { font-size:11px; font-weight:600; color:#555; margin-bottom:4px; }
+.field-input {
+  width:100%; background:#fff; border:1.5px solid #e0e0e0; border-radius:10px;
+  padding:10px 12px; font-size:13px; color:#1a1a1a; font-weight:500;
+  outline:none; transition:border-color .15s;
+}
+.field-input:focus { border-color:#888; }
+.price-row { display:flex; align-items:center; gap:0; }
+.price-prefix {
+  background:#f0f0f0; border:1.5px solid #e0e0e0; border-right:none;
+  border-radius:10px 0 0 10px; padding:10px 10px; font-size:14px; font-weight:700; color:#777;
+}
+.price-input {
+  flex:1; border:1.5px solid #e0e0e0; border-radius:0 10px 10px 0;
+  padding:10px 12px; font-size:16px; font-weight:700; color:#1a1a1a;
+  outline:none; background:#fff; transition:border-color .15s;
+}
+.price-input:focus { border-color:#888; }
+
+/* ── CHIPS ───────────────────────────────── */
+.chip-group { display:flex; flex-wrap:wrap; gap:6px; }
+.chip {
+  border:1.5px solid #e0e0e0; border-radius:20px; padding:5px 12px;
+  font-size:12px; color:#555; cursor:pointer; background:#fff; transition:all .15s; user-select:none;
+}
+.chip:hover { border-color:#888; }
+.chip.selected { background:#1a1a1a; color:#fff; border-color:#1a1a1a; }
+.chip-add {
+  border:1.5px dashed #bbb; border-radius:20px; padding:5px 12px;
+  font-size:12px; color:#888; cursor:pointer; background:#f7f7f7;
+  display:flex; align-items:center; gap:4px;
+}
+
+/* ── LOCAL CARDS (S1.5) ──────────────────── */
+.filter-bar { display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; }
+.filter-bar::-webkit-scrollbar { display:none; }
+.filter-chip {
+  border:1.5px solid #e0e0e0; border-radius:20px; padding:5px 12px;
+  font-size:11.5px; color:#555; cursor:pointer; background:#fff; white-space:nowrap;
+  flex-shrink:0; transition:all .15s;
+}
+.filter-chip.active { background:#1a1a1a; color:#fff; border-color:#1a1a1a; }
+.local-list-card {
+  background:#fff; border-radius:14px; border:1.5px solid #e0e0e0; padding:14px;
+  display:flex; flex-direction:column; gap:8px; cursor:pointer; transition:border-color .15s;
+}
+.local-list-card:hover { border-color:#888; }
+.local-list-card.selected-card { border-color:#1a1a1a; border-width:2px; }
+.local-card-top { display:flex; justify-content:space-between; align-items:flex-start; }
+.local-name { font-size:14px; font-weight:700; color:#1a1a1a; }
+.local-badge {
+  font-size:9px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;
+  padding:2px 7px; border-radius:6px; flex-shrink:0;
+}
+.badge-popular { background:#1a1a1a; color:#fff; }
+.badge-close { background:#e8e8e8; color:#444; }
+.badge-space { background:#f0f0f0; color:#555; }
+.local-addr { font-size:12px; color:#777; }
+.local-meta { display:flex; gap:6px; flex-wrap:wrap; }
+.meta-pill {
+  background:#f0f0f0; border-radius:8px; padding:3px 9px;
+  font-size:11px; color:#444; font-weight:500;
+}
+.local-availability { display:flex; align-items:center; gap:6px; }
+.avail-bar-wrap { flex:1; height:5px; background:#e8e8e8; border-radius:3px; overflow:hidden; }
+.avail-bar { height:100%; background:#1a1a1a; border-radius:3px; }
+.avail-label { font-size:10px; color:#888; flex-shrink:0; }
+.sel-check { font-size:18px; margin-left:auto; }
+
+/* ── LOCAL DETAIL (S2) ───────────────────── */
+.local-detail-card {
+  background:#fff; border:2px solid #1a1a1a; border-radius:14px; padding:14px;
+  display:flex; flex-direction:column; gap:8px; position:relative;
+}
+.selected-badge {
+  position:absolute; top:10px; right:10px;
+  background:#1a1a1a; color:#fff; font-size:9px; font-weight:700;
+  letter-spacing:.8px; text-transform:uppercase; padding:2px 8px; border-radius:10px;
+}
+.cost-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f0f0f0; }
+.cost-row:last-child { border-bottom:none; }
+.cost-label { font-size:12.5px; color:#555; }
+.cost-value { font-size:13px; font-weight:700; color:#1a1a1a; }
+.cost-value.green { color:#2a6e47; }
+
+/* ── STEPS (S2) ──────────────────────────── */
+.steps-list { display:flex; flex-direction:column; gap:0; }
+.step-item { display:flex; gap:10px; align-items:flex-start; padding:8px 0; position:relative; }
+.step-item:not(:last-child)::after {
+  content:''; position:absolute; left:13px; top:30px; bottom:0;
+  width:1.5px; background:#e0e0e0;
+}
+.step-num {
+  width:27px; height:27px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; position:relative; z-index:1;
+}
+.step-num.active { background:#1a1a1a; color:#fff; }
+.step-num.inactive { background:#e8e8e8; color:#888; border:1.5px solid #ddd; }
+.step-text { padding-top:4px; font-size:12.5px; color:#333; line-height:1.4; }
+.step-text strong { font-weight:700; color:#1a1a1a; }
+.step-text small { font-size:11px; color:#888; display:block; margin-top:1px; }
+
+/* ── HIGHLIGHT ROWS ──────────────────────── */
+.highlight-row { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #f0f0f0; }
+.highlight-row:last-child { border-bottom:none; }
+.hl-icon { font-size:17px; width:26px; text-align:center; flex-shrink:0; }
+.hl-text { font-size:12px; color:#333; line-height:1.4; }
+.hl-text strong { font-weight:700; color:#1a1a1a; }
+
+/* ── PAYMENT SCREEN (S2.5) ───────────────── */
+.payment-method-row {
+  display:flex; align-items:center; gap:10px; padding:12px; border-radius:12px;
+  border:1.5px solid #e0e0e0; cursor:pointer; transition:border-color .15s; background:#fff;
+}
+.payment-method-row.selected { border-color:#1a1a1a; background:#fafafa; }
+.pm-icon { font-size:22px; width:32px; text-align:center; flex-shrink:0; }
+.pm-info { flex:1; }
+.pm-name { font-size:13px; font-weight:700; color:#1a1a1a; }
+.pm-desc { font-size:11px; color:#888; margin-top:1px; }
+.pm-radio {
+  width:18px; height:18px; border-radius:50%; border:2px solid #ddd;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.pm-radio.checked { border-color:#1a1a1a; background:#1a1a1a; }
+.pm-radio.checked::after { content:''; width:6px; height:6px; border-radius:50%; background:#fff; }
+
+.escrow-explain {
+  background:#f5f5f5; border-radius:12px; padding:12px 14px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.escrow-step-row { display:flex; gap:8px; align-items:flex-start; }
+.escrow-step-icon { font-size:16px; width:22px; text-align:center; flex-shrink:0; margin-top:1px; }
+.escrow-step-text { font-size:12px; color:#333; line-height:1.4; }
+.escrow-step-text strong { color:#1a1a1a; }
+
+.price-breakdown { display:flex; flex-direction:column; gap:0; }
+.pb-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed #e8e8e8; font-size:13px; }
+.pb-row:last-child { border-bottom:none; border-top:1.5px solid #1a1a1a; margin-top:4px; padding-top:10px; }
+.pb-label { color:#555; }
+.pb-value { font-weight:600; color:#1a1a1a; }
+.pb-row.total .pb-label { font-weight:700; color:#1a1a1a; }
+.pb-row.total .pb-value { font-weight:800; font-size:15px; }
+
+/* ── CODE / CONFIRM (S3) ─────────────────── */
+.code-box {
+  background:#1a1a1a; color:#fff; border-radius:12px; padding:16px;
+  text-align:center; display:flex; flex-direction:column; gap:4px;
+}
+.code-label { font-size:10px; color:#888; letter-spacing:1px; text-transform:uppercase; }
+.code-value { font-family:'Courier New',monospace; font-size:22px; font-weight:700; letter-spacing:2px; }
+
+.deadline-banner {
+  background:#fff; border:2px solid #1a1a1a; border-radius:12px; padding:12px 14px;
+  display:flex; gap:10px; align-items:flex-start;
+}
+.dl-icon { font-size:22px; flex-shrink:0; }
+.dl-text { font-size:12px; line-height:1.5; color:#1a1a1a; }
+.dl-text strong { font-size:13px; display:block; margin-bottom:2px; }
+.dl-countdown { display:flex; gap:8px; margin-top:6px; }
+.dl-box {
+  flex:1; background:#f0f0f0; border-radius:8px; padding:8px 0; text-align:center;
+}
+.dl-num { font-size:20px; font-weight:800; color:#1a1a1a; display:block; }
+.dl-unit { font-size:9px; color:#888; font-weight:600; letter-spacing:.5px; }
+
+.status-badge {
+  display:inline-flex; align-items:center; gap:5px; background:#f5f5f5;
+  border:1.5px solid #ddd; border-radius:8px; padding:4px 10px;
+  font-size:11px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:.5px;
+}
+.status-dot { width:7px; height:7px; border-radius:50%; background:#bbb; animation:pulse 1.8s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.summary-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f0f0f0; }
+.summary-row:last-child { border-bottom:none; }
+.sum-label { font-size:12px; color:#888; }
+.sum-value { font-size:13px; font-weight:600; color:#1a1a1a; }
+.sum-value.code { font-family:'Courier New',monospace; background:#f0f0f0; padding:2px 8px; border-radius:6px; letter-spacing:.5px; }
+
+.timeline { display:flex; align-items:center; overflow-x:auto; padding:4px 0; }
+.timeline::-webkit-scrollbar { display:none; }
+.tl-item { display:flex; flex-direction:column; align-items:center; gap:4px; flex-shrink:0; }
+.tl-node { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; position:relative; z-index:1; }
+.tl-node.done { background:#1a1a1a; color:#fff; }
+.tl-node.current { background:#fff; color:#1a1a1a; border:2.5px solid #1a1a1a; }
+.tl-node.future { background:#e8e8e8; color:#aaa; }
+.tl-label { font-size:8px; color:#666; text-align:center; max-width:44px; line-height:1.2; }
+.tl-line { height:2px; flex:1; min-width:10px; background:#e0e0e0; margin-bottom:18px; }
+.tl-line.done-line { background:#1a1a1a; }
+
+/* ── HOME SCREEN (S0) ────────────────────── */
+.home-greeting { font-size:17px; font-weight:800; color:#1a1a1a; }
+.home-sub { font-size:12px; color:#888; margin-top:2px; }
+.action-card {
+  background:#fff; border-radius:16px; border:1.5px solid #e0e0e0;
+  padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer;
+  transition:border-color .15s, box-shadow .15s;
+}
+.action-card:hover { border-color:#888; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+.action-card.primary-action { background:#1a1a1a; border-color:#1a1a1a; }
+.action-icon { font-size:28px; width:44px; text-align:center; flex-shrink:0; }
+.action-body { flex:1; }
+.action-title { font-size:14px; font-weight:700; color:#1a1a1a; }
+.action-title.white { color:#fff; }
+.action-desc { font-size:11.5px; color:#888; margin-top:2px; line-height:1.4; }
+.action-desc.white { color:#999; }
+.action-arrow { font-size:16px; color:#ccc; flex-shrink:0; }
+.action-arrow.white { color:#555; }
+.action-disabled { opacity:.4; cursor:default; }
+
+.stats-row { display:flex; gap:8px; }
+.stat-card { flex:1; background:#fff; border-radius:12px; border:1px solid #e0e0e0; padding:12px; text-align:center; }
+.stat-num { font-size:22px; font-weight:800; color:#1a1a1a; }
+.stat-lbl { font-size:10px; color:#888; margin-top:2px; }
+
+/* ── MODAL OVERLAY ───────────────────────── */
+.modal-overlay {
+  display:none; position:absolute; inset:0; background:rgba(0,0,0,.5);
+  z-index:100; align-items:flex-end; border-radius:40px; overflow:hidden;
+}
+.modal-overlay.open { display:flex; }
+.modal-sheet {
+  width:100%; background:#fff; border-radius:20px 20px 0 0;
+  padding:16px; max-height:80%; overflow-y:auto; display:flex; flex-direction:column; gap:12px;
+}
+.modal-sheet::-webkit-scrollbar { width:0; }
+.modal-handle { width:36px; height:4px; background:#e0e0e0; border-radius:2px; margin:0 auto 4px; }
+.modal-title { font-size:15px; font-weight:700; color:#1a1a1a; }
+.custom-tag-input { display:flex; gap:6px; }
+.cti-field {
+  flex:1; border:1.5px solid #e0e0e0; border-radius:10px; padding:9px 12px;
+  font-size:13px; outline:none; transition:border-color .15s;
+}
+.cti-field:focus { border-color:#888; }
+.cti-btn {
+  background:#1a1a1a; color:#fff; border:none; border-radius:10px;
+  padding:9px 14px; font-size:13px; font-weight:700; cursor:pointer;
+}
+.modal-chip-group { display:flex; flex-wrap:wrap; gap:6px; }
+.modal-close {
+  width:100%; background:#f0f0f0; border:none; border-radius:12px;
+  padding:12px; font-size:14px; font-weight:600; color:#333; cursor:pointer;
+}
+
+/* ── PHOTO MODAL ─────────────────────────── */
+.photo-modal-sheet { padding-bottom:24px; }
+.photo-thumb-preview {
+  width:100%; aspect-ratio:4/3; background:#e8e8e8; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:48px; color:#bbb; margin-bottom:4px;
+}
+.photo-actions { display:flex; gap:8px; }
+.photo-btn {
+  flex:1; padding:12px; border-radius:12px; border:1.5px solid #ddd;
+  background:#fff; font-size:13px; font-weight:600; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+}
+.photo-btn span { font-size:13px; }
+
+/* ── BUTTONS ─────────────────────────────── */
+.btn-bar { padding:12px 16px; background:#fff; border-top:1px solid #eee; display:flex; flex-direction:column; gap:8px; }
+.btn-primary {
+  width:100%; background:#1a1a1a; color:#fff; border:none; border-radius:14px;
+  padding:14px; font-size:15px; font-weight:700; cursor:pointer; transition:opacity .15s;
+}
+.btn-primary:active { opacity:.8; }
+.btn-secondary {
+  width:100%; background:#fff; color:#1a1a1a; border:1.5px solid #ddd;
+  border-radius:14px; padding:12px; font-size:14px; font-weight:600; cursor:pointer; transition:background .15s;
+}
+.btn-secondary:active { background:#f5f5f5; }
+.btn-ghost { width:100%; background:transparent; color:#888; border:none; padding:8px; font-size:13px; cursor:pointer; }
+.btn-link { background:none; border:none; color:#555; font-size:13px; text-decoration:underline; cursor:pointer; padding:4px; }
+
+/* ── BOTTOM NAV ──────────────────────────── */
+.nav-bottom { background:#fff; border-top:1px solid #eee; display:flex; justify-content:space-around; padding:8px 0 12px; }
+.nav-tab { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:9px; color:#bbb; font-weight:600; letter-spacing:.3px; }
+.nav-tab.active { color:#1a1a1a; }
+.nav-tab .tab-icon { font-size:18px; }
+
+/* ── DIVIDER ─────────────────────────────── */
+.divider { height:1px; background:#f0f0f0; }
+
+/* ── OBSERVER NOTE ───────────────────────── */
+.observer-note { width:390px; margin-top:20px; background:#fff; border-radius:16px; border:1px solid #ddd; padding:14px 16px; display:flex; flex-direction:column; gap:6px; }
+.obs-title { font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#888; }
+.obs-items { display:flex; flex-direction:column; gap:4px; }
+.obs-item { display:flex; gap:8px; font-size:11.5px; color:#444; line-height:1.4; }
+.obs-item::before { content:'→'; color:#1a1a1a; font-weight:700; flex-shrink:0; }
+
+/* ── SCREEN DOTS ─────────────────────────── */
+.screen-dots { display:flex; gap:8px; margin-top:16px; justify-content:center; flex-wrap:wrap; max-width:390px; }
+.dot { width:8px; height:8px; border-radius:50%; background:#ccc; cursor:pointer; transition:all .2s; }
+.dot.active { background:#1a1a1a; width:24px; border-radius:4px; }
+.dot-label { font-size:9px; color:#888; text-align:center; }
+.dots-group { display:flex; flex-direction:column; align-items:center; gap:3px; }
+</style>
+</head>
+<body>
+
+<div class="lab-badge">Experimento 1 — Validación de Idea</div>
+<div class="exp-title">Supuesto: Vendedores confían en custodia + escrow para vender</div>
+
+<!-- ════════════ PHONE ════════════ -->
+<div class="phone">
+
+<!-- ══════════════════════════════════════════
+     S0 — HOME / INICIO
+═══════════════════════════════════════════ -->
+<div class="screen active" id="s0">
+  <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"><span>▐▐▐</span><span>WiFi</span><span>🔋</span></div></div>
+  <div class="nav-bar"><span class="nav-title">Vende Seguro</span></div>
+  <div class="scroll-content">
+
+    <div>
+      <div class="home-greeting">Hola, Daniel 👋</div>
+      <div class="home-sub">¿Qué quieres hacer hoy?</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num">0</div><div class="stat-lbl">En custodia</div></div>
+      <div class="stat-card"><div class="stat-num">0</div><div class="stat-lbl">Citas activas</div></div>
+      <div class="stat-card"><div class="stat-num">S/. 0</div><div class="stat-lbl">Vendido</div></div>
+    </div>
+
+    <div class="section-label">Acciones</div>
+
+    <!-- PRIMARY: Registrar producto -->
+    <div class="action-card primary-action" onclick="goTo('s1')">
+      <div class="action-icon">📦</div>
+      <div class="action-body">
+        <div class="action-title white">Registrar producto</div>
+        <div class="action-desc white">Deja tu artículo en custodia y véndelo de forma segura</div>
+      </div>
+      <div class="action-arrow white">›</div>
+    </div>
+
+    <!-- DISABLED -->
+    <div class="action-card action-disabled">
+      <div class="action-icon">📅</div>
+      <div class="action-body">
+        <div class="action-title">Mis citas</div>
+        <div class="action-desc">Gestiona las visitas de compradores</div>
+      </div>
+      <div class="action-arrow">›</div>
+    </div>
+
+    <div class="action-card action-disabled">
+      <div class="action-icon">💳</div>
+      <div class="action-body">
+        <div class="action-title">Mis cobros</div>
+        <div class="action-desc">Historial de pagos y escrow</div>
+      </div>
+      <div class="action-arrow">›</div>
+    </div>
+
+    <div class="action-card action-disabled">
+      <div class="action-icon">🏪</div>
+      <div class="action-body">
+        <div class="action-title">Mis locales</div>
+        <div class="action-desc">Ver locales afiliados cerca tuyo</div>
+      </div>
+      <div class="action-arrow">›</div>
+    </div>
+
+    <div style="font-size:10.5px; color:#aaa; text-align:center;">Las demás funciones estarán disponibles próximamente</div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     S1 — REGISTRO DEL PRODUCTO
+═══════════════════════════════════════════ -->
+<div class="screen" id="s1">
+  <!-- Photo modal -->
+  <div class="modal-overlay" id="photoModal">
+    <div class="modal-sheet photo-modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="photoModalTitle">Foto: Frente</div>
+      <div class="photo-thumb-preview">📷</div>
+      <div class="photo-actions">
+        <div class="photo-btn" onclick="confirmPhoto()"><span>📷</span>Cámara</div>
+        <div class="photo-btn" onclick="confirmPhoto()"><span>🖼️</span>Galería</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('photoModal')">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- State chips modal -->
+  <div class="modal-overlay" id="stateModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Estado del producto</div>
+      <div class="modal-chip-group" id="stateChipGroup">
+        <div class="chip selected" onclick="selectChipModal(this,'stateDisplay')">Nuevo con caja</div>
+        <div class="chip selected" onclick="selectChipModal(this,'stateDisplay')">Nuevo sin caja</div>
+        <div class="chip" onclick="selectChipModal(this,'stateDisplay')">Usada – Como nuevo</div>
+        <div class="chip" onclick="selectChipModal(this,'stateDisplay')">Buen estado</div>
+        <div class="chip" onclick="selectChipModal(this,'stateDisplay')">Estado regular</div>
+        <div class="chip" onclick="selectChipModal(this,'stateDisplay')">Con detalles visibles</div>
+        <div class="chip" onclick="selectChipModal(this,'stateDisplay')">Para repuestos</div>
+      </div>
+      <div style="font-size:11px; color:#888; margin-top:2px;">O añade una etiqueta personalizada:</div>
+      <div class="custom-tag-input">
+        <input class="cti-field" placeholder="Ej. Funcional pero pantalla rayada" id="customStateInput"/>
+        <button class="cti-btn" onclick="addCustomState()">+ Añadir</button>
+      </div>
+      <button class="modal-close" onclick="closeModal('stateModal')">Listo</button>
+    </div>
+  </div>
+
+  <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"><span>▐▐▐</span><span>WiFi</span><span>🔋</span></div></div>
+  <div class="nav-bar">
+    <button class="nav-back" onclick="goTo('s0')">←</button>
+    <span class="nav-title">Registrar Producto</span>
+    <span class="nav-step">Paso 1 de 5</span>
+  </div>
+  <div class="progress-wrap"><div class="progress-fill" style="width:20%"></div></div>
+
+  <div class="scroll-content">
+
+    <div class="trust-banner">
+      <span class="trust-icon">🔒</span>
+      <div class="trust-text">
+        <strong>Protección total de tu producto</strong>
+        Tu producto estará protegido mediante registro fotográfico, videos de cada manipulación y monitoreo de estado en tiempo real.
+      </div>
+    </div>
+
+    <!-- FOTOS OBLIGATORIAS -->
+    <div class="card">
+      <div class="photo-section-label">
+        Fotografías <span class="photo-req-badge">Obligatorias</span>
+      </div>
+      <div style="font-size:11px; color:#888; margin-top:-4px; margin-bottom:2px;">Las 6 vistas son requeridas para proteger tu producto</div>
+      <div class="photo-grid" id="requiredPhotoGrid">
+        <div class="photo-slot" onclick="openPhotoModal('Frente','req-0')">
+          <span class="cam">📷</span>
+          <span class="photo-label">Frente</span>
+        </div>
+        <div class="photo-slot" onclick="openPhotoModal('Parte trasera','req-1')">
+          <span class="cam">📷</span>
+          <span class="photo-label">Trasera</span>
+        </div>
+        <div class="photo-slot" onclick="openPhotoModal('Lado izquierdo','req-2')">
+          <span class="cam">📷</span>
+          <span class="photo-label">Costado izq.</span>
+        </div>
+        <div class="photo-slot" onclick="openPhotoModal('Lado derecho','req-3')">
+          <span class="cam">📷</span>
+          <span class="photo-label">Costado der.</span>
+        </div>
+        <div class="photo-slot" onclick="openPhotoModal('Parte superior','req-4')">
+          <span class="cam">📷</span>
+          <span class="photo-label">Arriba</span>
+        </div>
+        <div class="photo-slot" onclick="openPhotoModal('Parte inferior','req-5')">
+          <span class="cam">📷</span>
+          <span class="photo-label">Abajo</span>
+        </div>
+      </div>
+      <div style="font-size:10.5px; color:#aaa; text-align:center;" id="reqPhotoCount">0 de 6 fotos completadas</div>
+    </div>
+
+    <!-- FOTOS OPCIONALES -->
+    <div class="card">
+      <div class="photo-section-label">
+        Fotografías adicionales <span class="photo-opt-badge">Opcionales</span>
+      </div>
+      <div style="font-size:11px; color:#888; margin-top:-4px; margin-bottom:2px;">Agrega fotos con etiqueta personalizada para mostrar detalles específicos</div>
+      <div class="photo-grid" id="optionalPhotoGrid">
+        <div class="photo-slot optional-add" onclick="openOptionalPhotoModal()">
+          <span class="cam" style="font-size:18px;">＋</span>
+          <span class="photo-label">Añadir foto</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOMBRE -->
+    <div>
+      <div class="field-label">Nombre del producto *</div>
+      <input class="field-input" type="text" id="prodName" value="Laptop Lenovo ThinkPad T14" placeholder="Ej. iPhone 14, Zapatillas Nike Air..."/>
+    </div>
+
+    <!-- DESCRIPCIÓN -->
+    <div>
+      <div class="field-label">Descripción (opcional)</div>
+      <textarea class="field-input" rows="3" id="prodDesc" placeholder="Describe el estado, accesorios incluidos, motivo de venta..." style="resize:none; font-family:inherit;">Laptop en excelente estado, batería dura 6 horas, incluye cargador original y maletín.</textarea>
+    </div>
+
+    <!-- ESTADO -->
+    <div>
+      <div class="field-label">Estado del producto *</div>
+      <div class="chip-group" id="stateChipsInline">
+        <div class="chip selected" onclick="selectState(this)">Nuevo con caja</div>
+        <div class="chip selected" onclick="selectState(this)">Nuevo sin caja</div>
+        <div class="chip" onclick="selectState(this)">Usada – Como nuevo</div>
+        <div class="chip" onclick="selectState(this)">Buen estado</div>
+        <div class="chip" onclick="selectState(this)">Con detalles</div>
+        <div class="chip-add" id="stateDisplay" onclick="openModal('stateModal')">＋ Más opciones</div>
+      </div>
+    </div>
+
+    <!-- PRECIO -->
+    <div>
+      <div class="field-label">Precio solicitado (S/.) *</div>
+      <div class="price-row">
+        <div class="price-prefix">S/.</div>
+        <input class="price-input" type="number" id="prodPrice" value="800" placeholder="0.00"/>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="btn-bar">
+    <button class="btn-primary" onclick="goTo('s1_5')">Continuar → Elegir local</button>
+    <button class="btn-secondary" onclick="void(0)">Guardar borrador</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     S1.5 — LISTA DE LOCALES
+═══════════════════════════════════════════ -->
+<div class="screen" id="s1_5">
+  <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"><span>▐▐▐</span><span>WiFi</span><span>🔋</span></div></div>
+  <div class="nav-bar">
+    <button class="nav-back" onclick="goTo('s1')">←</button>
+    <span class="nav-title">Elegir Local</span>
+    <span class="nav-step">Paso 2 de 5</span>
+  </div>
+  <div class="progress-wrap"><div class="progress-fill" style="width:40%"></div></div>
+
+  <div class="scroll-content">
+
+    <!-- FILTROS -->
+    <div>
+      <div class="section-label">Ordenar por</div>
+      <div class="filter-bar" style="margin-top:6px;">
+        <div class="filter-chip active" onclick="setFilter(this)">📍 Más cercano</div>
+        <div class="filter-chip" onclick="setFilter(this)">🔥 Más solicitado</div>
+        <div class="filter-chip" onclick="setFilter(this)">📦 Mayor espacio</div>
+        <div class="filter-chip" onclick="setFilter(this)">💰 Menor tarifa</div>
+        <div class="filter-chip" onclick="setFilter(this)">⭐ Mejor calificado</div>
+      </div>
+    </div>
+
+    <!-- LOCALES LIST (rendered dynamically) -->
+    <div id="localsContainer"></div>
+
+  </div>
+
+  <div class="btn-bar">
+    <button class="btn-primary" onclick="goTo('s2')">Ver detalles del local →</button>
+    <button class="btn-ghost" onclick="goTo('s1')">← Volver al producto</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     S2 — DETALLE DEL LOCAL Y CUSTODIA
+═══════════════════════════════════════════ -->
+<div class="screen" id="s2">
+  <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"><span>▐▐▐</span><span>WiFi</span><span>🔋</span></div></div>
+  <div class="nav-bar">
+    <button class="nav-back" onclick="goTo('s1_5')">←</button>
+    <span class="nav-title">Local y Custodia</span>
+    <span class="nav-step">Paso 3 de 5</span>
+  </div>
+  <div class="progress-wrap"><div class="progress-fill" style="width:60%"></div></div>
+
+  <div class="scroll-content">
+
+    <!-- LOCAL SELECCIONADO -->
+    <div class="local-detail-card">
+      <span class="selected-badge">✓ Seleccionado</span>
+      <div class="local-name">CC Santa Anita — Módulo 1</div>
+      <div class="local-addr">📍 Av. Metropolitan 3, Santa Anita, Lima</div>
+      <div class="local-meta">
+        <div class="meta-pill">🕐 8am–9pm</div>
+        <div class="meta-pill">📦 25 lockers</div>
+        <div class="meta-pill">🔐 Seguridad 24h</div>
+        <div class="meta-pill">⭐ 4.8</div>
+      </div>
+      <div class="divider"></div>
+      <div class="cost-row"><span class="cost-label">Tarifa de reserva</span><span class="cost-value">S/. 20.00</span></div>
+      <div class="cost-row"><span class="cost-label">Custodia máxima</span><span class="cost-value">30 días</span></div>
+      <div class="cost-row"><span class="cost-label">Comisión por venta</span><span class="cost-value">5 – 10%</span></div>
+      <div class="cost-row"><span class="cost-label">Recibes si vendes</span><span class="cost-value green">S/. 720 – 760</span></div>
+      <button class="btn-link" onclick="goTo('s1_5')">← Cambiar local</button>
+    </div>
+
+    <!-- TRUST -->
+    <div class="trust-banner">
+      <span class="trust-icon">🛡️</span>
+      <div class="trust-text">
+        <strong>Nunca perderás tu producto ni tu dinero</strong>
+        Evidencias fotográficas y video en cada retiro. Retira tu producto en cualquier momento. Estado rastreable en la app.
+      </div>
+    </div>
+
+    <!-- CÓMO FUNCIONA -->
+    <div>
+      <div class="section-label">Cómo funciona</div>
+      <div class="card" style="margin-top:6px">
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-num inactive">1</div>
+            <div class="step-text"><strong>Depositas tu producto</strong><small>El empleado registra fotos y verifica el estado</small></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num inactive">2</div>
+            <div class="step-text"><strong>Producto en custodia segura</strong><small>Locker inteligente con monitoreo 24/7</small></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num inactive">3</div>
+            <div class="step-text"><strong>El comprador agenda visita</strong><small>Tú le envías invitación por WhatsApp</small></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num inactive">4</div>
+            <div class="step-text"><strong>Inspección supervisada</strong><small>Empleado graba video de la prueba</small></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num inactive">5</div>
+            <div class="step-text"><strong>Pago por escrow — tu dinero seguro</strong><small>Los fondos se liberan cuando el comprador acepta</small></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num inactive">↩</div>
+            <div class="step-text"><strong>¿No se vende? Retiras cuando quieras</strong><small>Sin costo antes de 30 días</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GARANTÍAS -->
+    <div class="card">
+      <div class="section-label" style="margin-bottom:4px">Garantías de protección</div>
+      <div class="highlight-row"><span class="hl-icon">📸</span><div class="hl-text"><strong>Registro fotográfico</strong> del estado inicial al depositar</div></div>
+      <div class="highlight-row"><span class="hl-icon">🎥</span><div class="hl-text"><strong>Video de cada manipulación</strong> por parte del comprador</div></div>
+      <div class="highlight-row"><span class="hl-icon">💳</span><div class="hl-text"><strong>Escrow:</strong> el dinero se retiene hasta confirmar entrega</div></div>
+      <div class="highlight-row"><span class="hl-icon">↩</span><div class="hl-text"><strong>Retiro libre</strong> en cualquier momento sin penalización</div></div>
+      <div class="highlight-row"><span class="hl-icon">📱</span><div class="hl-text"><strong>Estado en tiempo real</strong> desde tu app</div></div>
+    </div>
+
+  </div>
+
+  <div class="btn-bar">
+    <button class="btn-primary" onclick="goTo('s2_5')">Continuar → Pagar reserva</button>
+    <button class="btn-ghost" onclick="goTo('s1_5')">← Elegir otro local</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     S2.5 — PAGO DE RESERVA
+═══════════════════════════════════════════ -->
+<div class="screen" id="s2_5">
+  <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"><span>▐▐▐</span><span>WiFi</span><span>🔋</span></div></div>
+  <div class="nav-bar">
+    <button class="nav-back" onclick="goTo('s2')">←</button>
+    <span class="nav-title">Pago de Reserva</span>
+    <span class="nav-step">Paso 4 de 5</span>
+  </div>
+  <div class="progress-wrap"><div class="progress-fill" style="width:80%"></div></div>
+
+  <div class="scroll-content">
+
+    <!-- QUÉ ES LA RESERVA -->
+    <div class="card">
+      <div class="section-label">¿Qué es la tarifa de reserva?</div>
+      <div class="escrow-explain">
+        <div class="escrow-step-row">
+          <span class="escrow-step-icon">🔐</span>
+          <div class="escrow-step-text"><strong>Asegura tu espacio en el locker</strong> del local elegido por hasta 30 días.</div>
+        </div>
+        <div class="escrow-step-row">
+          <span class="escrow-step-icon">📸</span>
+          <div class="escrow-step-text"><strong>Cubre el registro fotográfico</strong> y video del estado inicial de tu producto.</div>
+        </div>
+        <div class="escrow-step-row">
+          <span class="escrow-step-icon">🛡️</span>
+          <div class="escrow-step-text"><strong>Activa la protección escrow</strong> — tu dinero de venta queda retenido hasta que confirmes la entrega.</div>
+        </div>
+        <div class="escrow-step-row">
+          <span class="escrow-step-icon">↩</span>
+          <div class="escrow-step-text"><strong>Si retiras el producto antes de venderlo,</strong> no se cobra comisión adicional.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESGLOSE DE PAGO -->
+    <div>
+      <div class="section-label">Resumen de cobro</div>
+      <div class="card" style="margin-top:6px">
+        <div class="price-breakdown">
+          <div class="pb-row"><span class="pb-label">Tarifa de reserva de locker</span><span class="pb-value">S/. 20.00</span></div>
+          <div class="pb-row total"><span class="pb-label">Total a pagar ahora</span><span class="pb-value">S/. 20.00</span></div>
+        </div>
+        <div style="font-size:10.5px; color:#aaa; text-align:center; margin-top:-4px;">La comisión de venta (5–10%) se descuenta solo si vendes</div>
+      </div>
+    </div>
+
+    <!-- MÉTODOS DE PAGO -->
+    <div>
+      <div class="section-label">Método de pago</div>
+      <div style="display:flex; flex-direction:column; gap:8px; margin-top:6px;">
+        <div class="payment-method-row selected" id="pm0" onclick="selectPM(0)">
+          <div class="pm-icon">💚</div>
+          <div class="pm-info"><div class="pm-name">Yape</div><div class="pm-desc">Pago instantáneo con tu número de celular</div></div>
+          <div class="pm-radio checked" id="pmr0"></div>
+        </div>
+        <div class="payment-method-row" id="pm1" onclick="selectPM(1)">
+          <div class="pm-icon">🔵</div>
+          <div class="pm-info"><div class="pm-name">Plin</div><div class="pm-desc">Transferencia a través de tu banco</div></div>
+          <div class="pm-radio" id="pmr1"></div>
+        </div>
+        <div class="payment-method-row" id="pm2" onclick="selectPM(2)">
+          <div class="pm-icon">💳</div>
+          <div class="pm-info"><div class="pm-name">Tarjeta de débito / crédito</div><div class="pm-desc">Visa, Mastercard, American Express</div></div>
+          <div class="pm-radio" id="pmr2"></div>
+        </div>
+        <div class="payment-method-row" id="pm3" onclick="selectPM(3)">
+          <div class="pm-icon">💵</div>
+          <div class="pm-info"><div class="pm-name">PagoEfectivo</div><div class="pm-desc">Paga en efectivo en cualquier agente</div></div>
+          <div class="pm-radio" id="pmr3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTA ESCROW -->
+    <div class="trust-banner">
+      <span class="trust-icon">🔒</span>
+      <div class="trust-text">
+        <strong>Pago seguro y protegido</strong>
+        Esta tarifa es procesada de forma cifrada. El dinero de la venta de tu producto pasará por el sistema de escrow — nunca es liberado sin tu confirmación.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="btn-bar">
+    <button class="btn-primary" onclick="goTo('s3')">Pagar S/. 20.00 y confirmar reserva</button>
+    <button class="btn-ghost" onclick="goTo('s2')">← Volver al local</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     S3 — CONFIRMACIÓN Y CÓDIGO
+═══════════════════════════════════════════ -->
+<div class="screen" id="s3">
+  <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"><span>▐▐▐</span><span>WiFi</span><span>🔋</span></div></div>
+  <div class="nav-bar">
+    <span class="nav-title">Reserva Confirmada</span>
+    <span class="nav-step">Paso 5 de 5</span>
+  </div>
+  <div class="progress-wrap"><div class="progress-fill" style="width:100%"></div></div>
+
+  <div class="scroll-content">
+
+    <!-- SUCCESS -->
+    <div style="text-align:center; padding:4px 0 6px">
+      <div style="font-size:44px; margin-bottom:6px">✓</div>
+      <div style="font-size:17px; font-weight:800; color:#1a1a1a;">¡Reserva completada!</div>
+      <div style="font-size:12px; color:#888; margin-top:3px;">Presenta tu código al llegar al local</div>
+    </div>
+
+    <!-- CÓDIGO -->
+    <div class="code-box">
+      <span class="code-label">Código de depósito</span>
+      <span class="code-value">LOCK-2026-87421</span>
+      <span style="font-size:10px; color:#666; margin-top:2px">Válido hasta depositar el producto</span>
+    </div>
+
+    <!-- ⏰ PLAZO PARA DEPOSITAR (NUEVO) -->
+    <div class="deadline-banner">
+      <span class="dl-icon">⏰</span>
+      <div class="dl-text">
+        <strong>Tienes 48 horas para depositar tu producto</strong>
+        Debes llevar el artículo al local antes de que venza este plazo. Si no lo depositas, la reserva se cancela automáticamente.
+        <div class="dl-countdown">
+          <div class="dl-box"><span class="dl-num">47</span><span class="dl-unit">horas</span></div>
+          <div class="dl-box"><span class="dl-num">58</span><span class="dl-unit">minutos</span></div>
+          <div class="dl-box"><span class="dl-num">12</span><span class="dl-unit">segundos</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTADO ACTUAL -->
+    <div class="card">
+      <div class="section-label">Estado actual</div>
+      <div style="display:flex; align-items:center; justify-content:space-between">
+        <div class="status-badge"><div class="status-dot"></div>Pendiente de depósito</div>
+        <div style="font-size:11px; color:#888">Ahora</div>
+      </div>
+    </div>
+
+    <!-- RESUMEN -->
+    <div>
+      <div class="section-label">Resumen de reserva</div>
+      <div class="card" style="margin-top:6px">
+        <div class="summary-row"><span class="sum-label">Producto</span><span class="sum-value">ThinkPad T14</span></div>
+        <div class="summary-row"><span class="sum-label">Precio</span><span class="sum-value">S/. 800.00</span></div>
+        <div class="summary-row"><span class="sum-label">Estado</span><span class="sum-value">Nuevo con caja</span></div>
+        <div class="summary-row"><span class="sum-label">Local</span><span class="sum-value">CC Santa Anita — M1</span></div>
+        <div class="summary-row"><span class="sum-label">Tarifa pagada</span><span class="sum-value">S/. 20.00</span></div>
+        <div class="summary-row"><span class="sum-label">Custodia hasta</span><span class="sum-value">30 días tras depósito</span></div>
+        <div class="summary-row"><span class="sum-label">Código</span><span class="sum-value code">LOCK-2026-87421</span></div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div>
+      <div class="section-label" style="margin-bottom:8px">Línea de tiempo</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-node current">●</div><div class="tl-label">Pendiente depósito</div></div>
+        <div class="tl-line"></div>
+        <div class="tl-item"><div class="tl-node future">2</div><div class="tl-label">En custodia</div></div>
+        <div class="tl-line"></div>
+        <div class="tl-item"><div class="tl-node future">3</div><div class="tl-label">Cita programada</div></div>
+        <div class="tl-line"></div>
+        <div class="tl-item"><div class="tl-node future">4</div><div class="tl-label">Inspección</div></div>
+        <div class="tl-line"></div>
+        <div class="tl-item"><div class="tl-node future">5</div><div class="tl-label">Escrow activo</div></div>
+        <div class="tl-line"></div>
+        <div class="tl-item"><div class="tl-node future">✓</div><div class="tl-label">Vendido</div></div>
+      </div>
+    </div>
+
+    <div class="trust-banner">
+      <span class="trust-icon">📱</span>
+      <div class="trust-text">
+        <strong>Monitoreo en tiempo real</strong>
+        Podrás ver el estado de tu producto en todo momento y solicitar su retiro antes de los 30 días sin costo adicional.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="btn-bar">
+    <button class="btn-primary" onclick="void(0)">Ver estado del producto</button>
+    <div style="display:flex; gap:8px">
+      <button class="btn-secondary" style="flex:1" onclick="void(0)">Descargar código</button>
+      <button class="btn-secondary" style="flex:1" onclick="goTo('s0')">Ir al inicio</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="nav-bottom">
+  <div class="nav-tab" id="btn0" onclick="goTo('s0')"><span class="tab-icon">🏠</span>Inicio</div>
+  <div class="nav-tab active" id="btn1"><span class="tab-icon">📦</span>Mis productos</div>
+  <div class="nav-tab"><span class="tab-icon">💳</span>Pagos</div>
+  <div class="nav-tab"><span class="tab-icon">👤</span>Perfil</div>
+</div>
+
+<!-- Optional photo label modal -->
+<div class="modal-overlay" id="optPhotoModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="optPhotoModalTitle">Foto adicional</div>
+    <div class="photo-thumb-preview" style="font-size:36px; color:#bbb;">📷</div>
+    <div>
+      <div class="field-label">Etiqueta para esta foto</div>
+      <input class="cti-field" style="width:100%; margin-bottom:8px;" placeholder="Ej. Teclado, Puerto USB, Cargador..." id="optPhotoLabel"/>
+    </div>
+    <div class="photo-actions">
+      <div class="photo-btn" onclick="addOptionalPhoto()"><span>📷</span><span id="optPhotoBtnLabel">Cámara</span></div>
+      <div class="photo-btn" onclick="addOptionalPhoto()"><span>🖼️</span>Galería</div>
+    </div>
+    <button class="modal-close" onclick="editingOptSlot=null; document.getElementById('optPhotoModalTitle').textContent='Foto adicional'; closeModal('optPhotoModal')">Cancelar</button>
+  </div>
+</div>
+
+</div><!-- /phone -->
+
+<!-- NAV DOTS -->
+<div class="screen-dots">
+  <div class="dots-group"><div class="dot active" id="d_s0" onclick="goTo('s0')"></div><div class="dot-label">Inicio</div></div>
+  <div class="dots-group"><div class="dot" id="d_s1" onclick="goTo('s1')"></div><div class="dot-label">P.1</div></div>
+  <div class="dots-group"><div class="dot" id="d_s1_5" onclick="goTo('s1_5')"></div><div class="dot-label">P.1.5</div></div>
+  <div class="dots-group"><div class="dot" id="d_s2" onclick="goTo('s2')"></div><div class="dot-label">P.2</div></div>
+  <div class="dots-group"><div class="dot" id="d_s2_5" onclick="goTo('s2_5')"></div><div class="dot-label">P.2.5</div></div>
+  <div class="dots-group"><div class="dot" id="d_s3" onclick="goTo('s3')"></div><div class="dot-label">P.3</div></div>
+</div>
+
+<!-- OBSERVER NOTE -->
+<div class="observer-note">
+  <div class="obs-title">🔬 Guía de observación — Entrevistador</div>
+  <div class="obs-items">
+    <div class="obs-item">¿Completa el flujo de reserva del locker sin interrupciones?</div>
+    <div class="obs-item">¿Qué información consulta antes de decidir (garantías, costo, proceso)?</div>
+    <div class="obs-item">¿Expresa dudas sobre la custodia, el escrow o la seguridad física?</div>
+    <div class="obs-item">¿Comprende que puede retirar el producto en cualquier momento?</div>
+    <div class="obs-item">¿Comprende que existen evidencias fotográficas y de video?</div>
+    <div class="obs-item">¿Nota el plazo de 48h para depositar y genera alguna objeción?</div>
+    <div class="obs-item" style="font-weight:700; color:#1a1a1a;">✓ Éxito si 7/10 vendedores aceptan dejar la laptop (S/.800) en custodia</div>
+  </div>
+</div>
+
+<script>
+// ── NAVIGATION ────────────────────────────────
+const SCREENS = ['s0','s1','s1_5','s2','s2_5','s3'];
+let currentScreen = 's0';
+
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+  const dot = document.getElementById('d_'+id);
+  if(dot) dot.classList.add('active');
+  // scroll content to top
+  const sc = document.getElementById(id).querySelector('.scroll-content');
+  if(sc) sc.scrollTop = 0;
+  currentScreen = id;
+}
+
+// ── PHOTO LOGIC ───────────────────────────────
+let currentPhotoSlotId = null;
+let reqPhotosFilled = [false,false,false,false,false,false];
+let optionalPhotos = [];
+
+function openPhotoModal(label, slotId) {
+  document.getElementById('photoModalTitle').textContent = 'Foto: '+label;
+  currentPhotoSlotId = slotId;
+  openModal('photoModal');
+}
+
+function confirmPhoto() {
+  closeModal('photoModal');
+  if(!currentPhotoSlotId) return;
+  const idx = parseInt(currentPhotoSlotId.split('-')[1]);
+  reqPhotosFilled[idx] = true;
+  const slots = document.querySelectorAll('#requiredPhotoGrid .photo-slot');
+  const labels = ['Frente','Trasera','Costado izq.','Costado der.','Arriba','Abajo'];
+  if(slots[idx]) {
+    slots[idx].classList.add('filled');
+    slots[idx].innerHTML = '<span class="tick">✓</span><span class="cam" style="font-size:16px;">🖼️</span><span class="photo-label">'+labels[idx]+'</span>';
+    slots[idx].onclick = () => openPhotoModal(labels[idx],'req-'+idx);
+  }
+  const count = reqPhotosFilled.filter(Boolean).length;
+  document.getElementById('reqPhotoCount').textContent = count+' de 6 fotos completadas';
+  currentPhotoSlotId = null;
+}
+
+function openOptionalPhotoModal() { openModal('optPhotoModal'); }
+
+let editingOptSlot = null;
+
+function addOptionalPhoto() {
+  const label = document.getElementById('optPhotoLabel').value.trim() || 'Foto extra';
+  const grid = document.getElementById('optionalPhotoGrid');
+  const addSlot = grid.querySelector('.optional-add');
+
+  if (editingOptSlot) {
+    // Edit existing slot
+    editingOptSlot.dataset.label = label;
+    editingOptSlot.querySelector('.photo-label').textContent = label;
+    editingOptSlot = null;
+  } else {
+    // Add new slot
+    optionalPhotos.push(label);
+    const idx = optionalPhotos.length - 1;
+    const newSlot = document.createElement('div');
+    newSlot.className = 'photo-slot filled';
+    newSlot.dataset.label = label;
+    newSlot.dataset.optIdx = idx;
+    newSlot.innerHTML = '<span class="tick">✓</span><span class="cam" style="font-size:16px;">🖼️</span><span class="photo-label" style="font-size:8px;">'+label+'</span>';
+    newSlot.onclick = function() { openEditOptionalPhoto(this); };
+    grid.insertBefore(newSlot, addSlot);
+  }
+  document.getElementById('optPhotoLabel').value = '';
+  document.getElementById('optPhotoModalTitle').textContent = 'Foto adicional';
+  document.getElementById('optPhotoBtnLabel').textContent = 'Cámara';
+  closeModal('optPhotoModal');
+}
+
+function openEditOptionalPhoto(slot) {
+  editingOptSlot = slot;
+  document.getElementById('optPhotoLabel').value = slot.dataset.label || '';
+  document.getElementById('optPhotoModalTitle').textContent = 'Editar foto';
+  document.getElementById('optPhotoBtnLabel').textContent = 'Retomar foto';
+  openModal('optPhotoModal');
+}
+
+// ── CHIPS ─────────────────────────────────────
+function selectState(el) {
+  const grp = el.closest('.chip-group');
+  grp.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectChipModal(el, displayId) {
+  el.classList.toggle('selected');
+}
+
+function addCustomState() {
+  const input = document.getElementById('customStateInput');
+  const val = input.value.trim();
+  if(!val) return;
+  const grp = document.getElementById('stateChipsInline');
+  const addBtn = grp.querySelector('.chip-add');
+  const chip = document.createElement('div');
+  chip.className = 'chip selected';
+  chip.textContent = val;
+  chip.onclick = function(){ selectState(this); };
+  grp.insertBefore(chip, addBtn);
+  // modal group too
+  const mgrp = document.getElementById('stateChipGroup');
+  const mchip = document.createElement('div');
+  mchip.className = 'chip';
+  mchip.textContent = val;
+  mchip.onclick = function(){ selectChipModal(this,'stateDisplay'); };
+  mgrp.appendChild(mchip);
+  input.value = '';
+}
+
+// ── FILTERS ───────────────────────────────────
+const localsData = [
+  {
+    id: 0,
+    name: 'CC Santa Anita — Módulo 1',
+    addr: '📍 Av. Metropolitan 3, Santa Anita',
+    badge: 'Más solicitado', badgeClass: 'badge-popular',
+    dist: 1.8, hours: '8am–9pm', price: 20, rating: 4.8, reviews: 127,
+    spaceUsed: 52, spaceFree: 13, spaceTotal: 25
+  },
+  {
+    id: 1,
+    name: 'CC Minka — Módulo 3',
+    addr: '📍 Av. Argentina 3093, Callao',
+    badge: 'Más cercano', badgeClass: 'badge-close',
+    dist: 0.9, hours: '9am–8pm', price: 15, rating: 4.5, reviews: 89,
+    spaceUsed: 80, spaceFree: 5, spaceTotal: 25
+  },
+  {
+    id: 2,
+    name: 'CC Plaza Lima Sur — M.7',
+    addr: '📍 Av. Benavides 3866, Surco',
+    badge: 'Mayor espacio', badgeClass: 'badge-space',
+    dist: 4.2, hours: '10am–10pm', price: 25, rating: 4.9, reviews: 203,
+    spaceUsed: 20, spaceFree: 20, spaceTotal: 25
+  }
+];
+
+let selectedLocalIdx = 0;
+
+function setFilter(el) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const txt = el.textContent.trim();
+
+  let sorted = [...localsData];
+  if (txt.includes('cercano'))      sorted.sort((a,b) => a.dist - b.dist);
+  else if (txt.includes('solicitado')) sorted.sort((a,b) => b.reviews - a.reviews);
+  else if (txt.includes('espacio'))    sorted.sort((a,b) => b.spaceFree - a.spaceFree);
+  else if (txt.includes('tarifa'))     sorted.sort((a,b) => a.price - b.price);
+  else if (txt.includes('calificado')) sorted.sort((a,b) => b.rating - a.rating);
+
+  renderLocals(sorted);
+}
+
+function renderLocals(list) {
+  const container = document.getElementById('localsContainer');
+  container.innerHTML = '';
+  list.forEach((loc, pos) => {
+    const isSelected = loc.id === selectedLocalIdx;
+    const div = document.createElement('div');
+    div.className = 'local-list-card' + (isSelected ? ' selected-card' : '');
+    div.id = 'localCard' + loc.id;
+    div.onclick = () => selectLocal(loc.id);
+    div.innerHTML = `
+      <div class="local-card-top">
+        <div>
+          <div class="local-name">${loc.name}</div>
+          <div class="local-addr">${loc.addr}</div>
+        </div>
+        <span class="local-badge ${loc.badgeClass}">${loc.badge}</span>
+      </div>
+      <div class="local-meta">
+        <div class="meta-pill">📏 ${loc.dist} km</div>
+        <div class="meta-pill">🕐 ${loc.hours}</div>
+        <div class="meta-pill">💰 S/.${loc.price} reserva</div>
+      </div>
+      <div class="local-availability">
+        <span class="avail-label">Espacio:</span>
+        <div class="avail-bar-wrap"><div class="avail-bar" style="width:${loc.spaceUsed}%"></div></div>
+        <span class="avail-label">${loc.spaceFree}/${loc.spaceTotal} libres</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:11px; color:#555;">⭐ ${loc.rating} · ${loc.reviews} reseñas · Seguridad 24h</div>
+        ${isSelected ? '<span class="sel-check">✓</span>' : ''}
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ── LOCAL SELECTION ───────────────────────────
+function selectLocal(idx) {
+  selectedLocalIdx = idx;
+  // Re-render with current sort (just refresh same list to update selection)
+  const activeFilter = document.querySelector('.filter-chip.active');
+  if (activeFilter) setFilter(activeFilter);
+  else renderLocals(localsData);
+}
+
+// ── PAYMENT METHOD ────────────────────────────
+function selectPM(idx) {
+  [0,1,2,3].forEach(i => {
+    document.getElementById('pm'+i).classList.remove('selected');
+    const r = document.getElementById('pmr'+i);
+    r.classList.remove('checked'); r.innerHTML='';
+  });
+  document.getElementById('pm'+idx).classList.add('selected');
+  const r = document.getElementById('pmr'+idx);
+  r.classList.add('checked');
+}
+
+// ── MODALS ────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── INIT ──────────────────────────────────────
+renderLocals(localsData);
+(function() {
+  let h=47, m=58, s=12;
+  setInterval(()=>{
+    s--; if(s<0){s=59;m--;} if(m<0){m=59;h--;} if(h<0){h=0;m=0;s=0;}
+    const hn=document.querySelector('.dl-num:nth-child(1)');
+    const mn=document.querySelectorAll('.dl-num')[1];
+    const sn=document.querySelectorAll('.dl-num')[2];
+    if(hn) hn.textContent=String(h).padStart(2,'0');
+    if(mn) mn.textContent=String(m).padStart(2,'0');
+    if(sn) sn.textContent=String(s).padStart(2,'0');
+  },1000);
+})();
+</script>
+
+</body>
+</html>
